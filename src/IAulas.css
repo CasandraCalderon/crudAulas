@@ -1,0 +1,39 @@
+.App {
+  text-align: center;
+}
+.table-fixed tbody {
+  height: 600px;
+  overflow-y: auto !important;
+  width: 95%;
+}
+
+.table-fixed thead,
+.table-fixed tbody,
+.table-fixed td,
+.table-fixed th {
+  display: block;
+}
+
+.table-fixed tbody td,
+.table-fixed thead > tr > th{
+  float: left;
+  border-bottom-width: 0;
+}
+
+
+.Primero {
+  width: 650px;
+}
+
+.Segundo {
+  width: 175px
+}
+
+#tablapersonañizada {
+  width: 1100px;
+}
+
+#formPersonalizado {
+  margin-right: 50px;
+  margin-left: 50px;
+}
