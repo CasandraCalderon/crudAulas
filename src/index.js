@@ -1,7 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import reportWebVitals from './reportWebVitals';
 import IAulas from './IAulas';
+import reportWebVitals from './reportWebVitals';
+
+
+//import IAulas from './IAulas';
+
 
 ReactDOM.render(
   <React.StrictMode>

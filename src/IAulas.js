@@ -5,9 +5,16 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrashAlt } from "@fortawesome/free-solid-svg-icons";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
+import Select from "react-select";
 
 const url = "http://localhost:3002/aulas";
-
+const options = [
+  { value: "PLANTA BAJA", label: "PLANTA BAJA" },
+  { value: "PRIMER PISO", label: "PRIMER PISO" },
+  { value: "SEGUNDO PISO", label: "SEGUNDO PISO" },
+  { value: "TERCER PISO", label: "TERCER PISO" },
+  { value: "CUARTO PISO", label: "CUARTO PISO" }
+];
 class IAulas extends Component {
   //Almacenar estado
   state={
@@ -17,13 +24,14 @@ class IAulas extends Component {
     form:{
       id: '',
       Nombre: '',
-      Piso: '',
+      Piso: null,
       Capacidad: '',
       TipoSala: '',
       tipoModal: ''
     }
   }
-  
+
+    
   peticionGet=()=>{
   axios.get(url).then(response=>{
     this.setState({data: response.data});
@@ -42,18 +50,16 @@ class IAulas extends Component {
     })
   }
   
-  //PROBLEMAS CON LAS PETICIONES PUT
   peticionPut=()=>{
-    axios.put(url,this.state.form.id, this.state.form).then(response=>{
+    axios.put(`${url}/${this.state.form.id}`, this.state.form).then(response=>{
       this.modalInsertar();
       this.peticionGet();
     })
 
   }
   
-  //PROBLEMAS CON LAS PETICIONES GET
   peticionDelete=()=>{
-    axios.delete(url,this.state.form.id).then(response=>{
+    axios.delete(`${url}/${this.state.form.id}`).then(response=>{
       this.setState({modalEliminar: false});
       this.peticionGet();
     })
@@ -87,38 +93,55 @@ class IAulas extends Component {
   console.log(this.state.form);
   }
   
+  handlePiso = Piso => {
+    this.setState ({Piso});
+    this.setState({
+      form:{
+        ...this.state.form, Piso: (options.filter(P => P.value === Piso).map(Piso => {return Piso.value}))
+      }
+    })
+    //console.log(`Option selected:`, Piso);
+    console.log(this.state.form);
+  };
+
+
     componentDidMount() {
       this.peticionGet();
     }
-    
+  
   
     render(){
       const {form}=this.state;
+      const { Piso } = this.state;
     return (
       <div>
       <br /><br />
-    <div className="text-center"><button className="btn btn-success" onClick={()=>{this.setState({form: null, tipoModal: 'insertar'}); this.modalInsertar()}}>Agregar Aula</button></div>
-    <br /><br />
+    <div className="text-center">
+      <button className="btn btn-success" onClick={()=>{this.setState({form: null, tipoModal: 'insertar'}); this.modalInsertar()}}>Agregar Aula</button>
+    </div>
+
+
+    <br />
       <table className="table table-fixed text-center container">
         <thead className="row">
-          <tr className="Primero">
-            <th className="Segundo">ID</th>
-            <th className="Segundo">Nombre</th>
-            <th className="Segundo">Piso</th>
-            <th className="Segundo">Capacidad de Alumnos</th>
-            <th className="Segundo">Tipo de Sala</th>
-            <th className="Segundo">Acciones</th>
+          <tr className="Pri">
+            <th className="Seg">ID</th>
+            <th className="Seg">Nombre</th>
+            <th className="Seg">Piso</th>
+            <th className="Seg">Capacidad de Alumnos</th>
+            <th className="Seg">Tipo de Sala</th>
+            <th className="Seg">Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {this.state.data.map(aulas=>{
+          {this.state.data.map(aulas=> {
             return(
-              <tr key={aulas.id} className="Primero">
-            <td className="Segundo">{aulas.id}</td>
-            <td className="Segundo">{aulas.Nombre}</td>
-            <td className="Segundo">{aulas.Piso}</td>
-            <td className="Segundo">{aulas.Capacidad}</td>
-            <td className="Segundo">{aulas.TipoSala}</td>
+              <tr key={aulas.id} className="Pri">
+            <td className="Seg">{aulas.id}</td>
+            <td className="Seg">{aulas.Nombre}</td>
+            <td className="Seg">{aulas.Piso}</td>
+            <td className="Seg">{aulas.Capacidad}</td>
+            <td className="Seg">{aulas.TipoSala}</td>
             <td>
                   <button className="btn btn-primary" onClick={()=>{this.seleccionarAula(aulas); this.modalInsertar()}}><FontAwesomeIcon icon={faEdit}/></button>
                   {"   "}
@@ -129,9 +152,7 @@ class IAulas extends Component {
           })}
         </tbody>
       </table>
-  
-  
-  
+
       <Modal isOpen={this.state.modalInsertar}>
                   <ModalHeader style={{display: 'block'}}>
                     <span style={{float: 'right'}} onClick={()=>this.modalInsertar()}>x</span>
@@ -144,8 +165,10 @@ class IAulas extends Component {
                       <label htmlFor="Nombre">Nombre</label>
                       <input className="form-control" type="text" name="Nombre" id="Nombre" onChange={this.handleChange} value={form?form.Nombre: ''}/>
                       <br />
+                    
                       <label htmlFor="Piso">Piso</label>
-                      <input className="form-control" type="text" name="Piso" id="Piso" onChange={this.handleChange} value={form?form.Piso: ''}/>
+                      <Select value={form? form.Piso: Piso} onChange={this.handlePiso} options={options} />
+                      
                       <br />
                       <label htmlFor="Capacidad">Capacidad de alumnos</label>
                         <input className="form-control" type="number" name="Capacidad" id="Capacidad" onChange={this.handleChange} value={form? form.Capacidad: ''}/>
@@ -155,7 +178,6 @@ class IAulas extends Component {
                         <br />
                     </div>
                   </ModalBody>
-  
                   <ModalFooter>
                     {this.state.tipoModal==='insertar'?
                       <button className="btn btn-success" onClick={()=>this.peticionPost()}>
